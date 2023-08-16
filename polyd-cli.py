@@ -107,7 +107,7 @@ def main():
     if version != (1,1,0):
         print()
         print("Warning: This program is tested with firmware 1.1.0 only.")
-        print("         In might not work as intended on other versions.")
+        print("         It might not work as intended on other versions.")
         print()
         exit(1)
 
