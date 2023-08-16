@@ -8,6 +8,8 @@ The program was written and tested with a Poly-D with firmware version 1.1.0 onl
 
 Poly-D CLI uses the [Mido](https://github.com/mido/mido) library to talk to the synthesizer. This library needs to be installed separately like described on Mido's project page.
 
+To connect to the synthesizer the first MIDI interface with `POLY D` in the name is used by the program. This means that configuring the Poly-D works only over the USB-MIDI connection.
+
 ## Usage
 
     usage: polyd-cli.py [-h] [-l] [-d] [--id ID] [--rx RX] [--tx TX] [--in_trans IN_TRANS] [--vel_on VEL_ON]
@@ -35,7 +37,7 @@ Poly-D CLI uses the [Mido](https://github.com/mido/mido) library to talk to the 
       --pbend_range PBEND_RANGE
                             set the pitch bend range (0-24)
       --mod_range MOD_RANGE
-                            set the mod wheel range (0-4)
+                            set the mod wheel range ('20%', '50%', '100%', '200%', '300%' or 0-5)
       --mod_curve MOD_CURVE
                             set the modulation curve ('soft', 'medium', 'hard' or 0-3)
       --note_zero NOTE_ZERO

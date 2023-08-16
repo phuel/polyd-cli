@@ -43,7 +43,7 @@ def dump(version, config):
     print("Arpeggiator MIDI Output  :", config.arpeggiator_output)
 
 def get_range_string(values):
-    text = ", ".join([f"'{v}'" for v in values])
+    text = ", ".join([f"\'{v}\'" for v in values])
     text += f" or 0-{len(values)}"
     return text
 
@@ -62,7 +62,7 @@ def main():
     parser.add_argument("--key_prio", help=f"set the key priority ({get_range_string(PolyD_Config.KEY_PRIORITIES)})", default=None)
     parser.add_argument("--multi_trig", help=f"set the multi trigger  ('on', 'off' or 0-1)", default=None)
     parser.add_argument("--pbend_range", help="set the pitch bend range (0-24)", type=int, default=None)
-    parser.add_argument("--mod_range", help="set the mod wheel range (0-4)", default=None)
+    parser.add_argument("--mod_range", help=f"set the mod wheel range ({get_range_string(PolyD_Config.MOD_RANGES).replace('%', '%%')})", default=None)
     parser.add_argument("--mod_curve", help=f"set the modulation curve ({get_range_string(PolyD_Config.CURVES)})", default=None)
     parser.add_argument("--note_zero", help="set the note at 0 CV (0-127)", type=int, default=None)
     parser.add_argument("--sync_rate", help=f"set the sync clock rate ({get_range_string(PolyD_Config.CLOCKS)})", default=None)
