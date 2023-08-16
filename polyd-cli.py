@@ -5,6 +5,9 @@ import argparse
 from midiconnection import MidiConnection, MidiException
 from polyd import PolyD, PolyD_Config, PolyD_InvalidArgumentException
 
+NAME = 'polyd-cli'
+VERSION = 1.0
+
 def first_or_default(arr, pred):
     return next(iter([x for x in arr if pred(x)]), None)
 
@@ -46,6 +49,7 @@ def get_range_string(values):
 
 def main():
     parser = argparse.ArgumentParser()
+    parser.add_argument("-v", "--version", help=f"show {NAME}'s version number.", action="store_true")
     parser.add_argument("-l", "--list", help="list the MIDI interfaces.", action="store_true")
     parser.add_argument("-d", "--dump", help="dumps the configuration.", action="store_true")
     parser.add_argument("--id", help="set the device id (0-127)", type=int, default=None)
@@ -79,6 +83,9 @@ def main():
         ids = MidiConnection().get_ids()
         for name in ids:
             print("    ", name)
+        return
+    if args.version:
+        print(f"{NAME} Version: {VERSION}")
         return
     args_dict = vars(args)
  
@@ -134,7 +141,7 @@ def main():
 
     try:
         for key,func in handlers.items():
-            if key in args_dict:    
+            if key in args_dict:
                 value = args_dict[key]
                 if value is not None:
                     func(value)
