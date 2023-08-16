@@ -12,7 +12,7 @@ To connect to the synthesizer the first MIDI interface with `POLY D` in the name
 
 ## Usage
 
-    usage: polyd-cli.py [-h] [-l] [-d] [--id ID] [--rx RX] [--tx TX] [--in_trans IN_TRANS] [--vel_on VEL_ON]
+    usage: polyd-cli.py [-h] [-v] [-l] [-d] [--id ID] [--rx RX] [--tx TX] [--in_trans IN_TRANS] [--vel_on VEL_ON]
                         [--vel_off VEL_OFF] [--vel_curve VEL_CURVE] [--key_prio KEY_PRIO] [--multi_trig MULTI_TRIG]
                         [--pbend_range PBEND_RANGE] [--mod_range MOD_RANGE] [--mod_curve MOD_CURVE] [--note_zero NOTE_ZERO]
                         [--sync_rate SYNC_RATE] [--sync_src SYNC_SRC] [--local LOCAL] [--ext_pol EXT_POL]
@@ -21,6 +21,7 @@ To connect to the synthesizer the first MIDI interface with `POLY D` in the name
 
     options:
       -h, --help            show this help message and exit
+      -v, --version         show polyd-cli's version number.
       -l, --list            list the MIDI interfaces.
       -d, --dump            dumps the configuration.
       --id ID               set the device id (0-127)
