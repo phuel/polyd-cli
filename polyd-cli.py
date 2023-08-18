@@ -6,13 +6,13 @@ from midiconnection import MidiConnection, MidiException
 from polyd import PolyD, PolyD_Config, PolyD_InvalidArgumentException
 
 NAME = 'polyd-cli'
-VERSION = 1.0
+VERSION = 1.1
 
 def first_or_default(arr, pred):
     return next(iter([x for x in arr if pred(x)]), None)
 
-def is_polyd(name):
-    return 'POLY D' in name
+def is_polyd(searched_name, port_name):
+    return searched_name in port_name
 
 def dump(version, config):
     print("Firmware version         :", ".".join([str(v) for v in version]))
@@ -49,9 +49,10 @@ def get_range_string(values):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("-v", "--version", help=f"show {NAME}'s version number.", action="store_true")
+    parser.add_argument("-V", "--version", help=f"show {NAME}'s version number.", action="version",  version=f'%(prog)s {VERSION}')
     parser.add_argument("-l", "--list", help="list the MIDI interfaces.", action="store_true")
     parser.add_argument("-d", "--dump", help="dumps the configuration.", action="store_true")
+    parser.add_argument("--port", help="MIDI port name.", default=None)
     parser.add_argument("--id", help="set the device id (0-127)", type=int, default=None)
     parser.add_argument("--rx", help="set MIDI rx channel (1-16)", type=int, default=None)
     parser.add_argument("--tx", help="set MIDI rx channel (1-16)", type=int, default=None)
@@ -84,14 +85,14 @@ def main():
         for name in ids:
             print("    ", name)
         return
-    if args.version:
-        print(f"{NAME} Version: {VERSION}")
-        return
     args_dict = vars(args)
  
+    port = 'POLY D'
+    if args.port is not None:
+        port = args.port
     midi = MidiConnection()
-    in_id = first_or_default(midi.get_input_ids(), is_polyd)
-    out_id = first_or_default(midi.get_output_ids(), is_polyd)
+    in_id = first_or_default(midi.get_input_ids(), lambda n: is_polyd(port, n))
+    out_id = first_or_default(midi.get_output_ids(), lambda n: is_polyd(port, n))
     if in_id is None or out_id is None:
         print("No Poly D found.")
         return
