@@ -1,32 +1,37 @@
-# Poly-D CLI
+# Poly D CLI
 
-Poly-D CLI is a command line program that can be used to configure the behringer Poly-D synthesizer.
+Poly D CLI is a command line program that can be used to configure the behringer Poly D synthesizer. Additionally it is able to save and restore the Poly D's configuration and the sequencer patterns.
 
 It offers the same settings as the official SYNTHTRIBE program, lacks a nice GUI, but runs on Linux as well.
 
 The program was written and tested with a Poly-D with firmware version 1.1.0 only. If an instrument with another firmware version is connected, a warning is printed, and the program aborts.
 
-Poly-D CLI uses the [Mido](https://github.com/mido/mido) library to talk to the synthesizer. This library needs to be installed separately like described on Mido's project page.
+Poly D CLI uses the [Mido](https://github.com/mido/mido) library to talk to the synthesizer. This library needs to be installed separately like described on Mido's project page.
 
-Configuring the Poly-D works only over the USB-MIDI connection. SysEx messages on the DIN ports seem to be ignored. To connect to the synthesizer the first MIDI interface with `POLY D` in the name is used by the program. As an alternative  the `--port` option can be used to specify the MIDI port name.
+Configuring the Poly-D works only over the USB-MIDI connection. SysEx messages on the DIN ports seem to be ignored. When connecting to the synthesizer the first MIDI interface with `POLY D` in the name is used by the program. As an alternative  the `--port` option can be used to specify the MIDI port name.
 
 ## Usage
 
-  usage: polyd-cli.py [-h] [-V] [-l] [-d] [--port PORT] [--id ID] [--rx RX] [--tx TX]
-                      [--in_trans IN_TRANS] [--vel_on VEL_ON] [--vel_off VEL_OFF] [--vel_curve VEL_CURVE]
-                      [--key_prio KEY_PRIO] [--multi_trig MULTI_TRIG] [--pbend_range PBEND_RANGE]
-                      [--mod_range MOD_RANGE] [--mod_curve MOD_CURVE] [--note_zero NOTE_ZERO]
-                      [--sync_rate SYNC_RATE] [--sync_src SYNC_SRC] [--local LOCAL] [--ext_pol EXT_POL]
-                      [--acc_vel ACC_VEL] [--clock_out CLOCK_OUT] [--pbend_out PBEND_OUT]
-                      [--mod_out MOD_OUT] [--key_out KEY_OUT] [--at_out AT_OUT] [--seq_out SEQ_OUT]
-                      [--arp_out ARP_OUT]
+    usage: polyd-cli.py [-h] [-V] [-l] [-d] [-s SAVE] [-r RESTORE] [-C] [-P] [-b BANK] [-p PATTERN]
+                        [--port PORT] [--id ID] [--rx RX] [--tx TX] [--in_trans IN_TRANS] [--vel_on VEL_ON]
+                        [--vel_off VEL_OFF] [--vel_curve VEL_CURVE] [--key_prio KEY_PRIO]
+                        [--multi_trig MULTI_TRIG] [--pbend_range PBEND_RANGE] [--mod_range MOD_RANGE]
+                        [--mod_curve MOD_CURVE] [--note_zero NOTE_ZERO] [--sync_rate SYNC_RATE]
+                        [--sync_src SYNC_SRC] [--local LOCAL] [--ext_pol EXT_POL] [--acc_vel ACC_VEL]
+                        [--clock_out CLOCK_OUT] [--pbend_out PBEND_OUT] [--mod_out MOD_OUT] [--key_out KEY_OUT]
+                        [--at_out AT_OUT] [--seq_out SEQ_OUT] [--arp_out ARP_OUT]
 
-  options:
+### Common options
+
     -h, --help            show this help message and exit
-    -v, --version         show polyd-cli's version number.
-    -l, --list            list the MIDI interfaces.
-    -d, --dump            dumps the configuration.
-    --port PORT           MIDI port name.
+    -V, --version         show polyd-cli's version number amd exit.
+    -l, --list            list the MIDI interfaces and exit.
+    --port PORT           name of the MIDI port used to communicate with the instrument.
+
+### Configuration options
+
+    -d, --dump            dumps the configuration to stdout.
+
     --id ID               set the device id (0-127)
     --rx RX               set MIDI rx channel (1-16)
     --tx TX               set MIDI rx channel (1-16)
@@ -65,6 +70,24 @@ Configuring the Poly-D works only over the USB-MIDI connection. SysEx messages o
 Multiple commands can be given on one command line and all are performed. If a configuration dump is selected, it is performed after all commands that set values.
 
 Text arguments, like for example for the velocity curve can be abbreviated. The first curve that contains the text, ignoring case and whitespace, is used in the case of velocity curves. 
+
+### Save/Restore options
+
+    -s FILENAME, --save FILENAME
+                          saves the configuration and patterns in file.
+    -r FILENAME, --restore FILENAME
+                          writes data from a file back to the instrument.
+    -C, --config_only     saves the configuration only.
+    -P, --patterns_only   saves the patterns only.
+    -b BANK, --bank BANK  the bank number of the saved or restored pattern.
+    -p PATTERN, --pattern PATTERN
+                          the pattern number of the saved or restored pattern.
+
+If only the configuration is saved, with the `--config_only` option, or if only one pattern is saved with the `--bank`, `--pattern` options the output file is a SysEx file that can be sent to the Poly D to restore the data.
+
+If all patterns are saved with or without the configuration the result is a zip-file containing all the individual SysEx file.
+
+If the data from such a zip file is restored, all data is restored. You cannot selectively restore parts of it other than moving a part of the content from the zip file.
 
 ## Poly-D SysEx Format
 

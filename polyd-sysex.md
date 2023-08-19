@@ -1,5 +1,7 @@
 # Poly-D SysEx Format
 
+This information is based on behringer's documentation and on my own observations.
+
 ## Command Format:
 
 F0 00 20 32 00 01 0C did cmd nn ... F7
@@ -42,12 +44,14 @@ nn ... = Arguments
 | 26 nn           | Arpeggiator output        | nn = 0=Off, 1=MIDI DIN, 2=MIDI USB, 3=Both      | 3       |
 | 2F nn           | Set local keyboard mode   | nn = 0=On, 1=Off                                | 1       |
 | 75              | Request settings          | Poly-D answers with Packet Type 76              |         |
+| 76 .....        | Set settings              | Poly-D answers with Packet Type 01              |         |
 | 77 nn mm        | Request sequencer pattern | nn = Bank                                       |         |
 |                 |                           | mm = Pattern                                    |         |
 |                 |                           | Poly-D answers with Packet Type 78              |         |
+| 78 .....        | Set a pattern             | Poly-D sends no answer                          |         |
 | 7D              | Restore factory settings  |                                                 |         |
 
-All commands setting a value on the Poly-D are answered with a packet of type 0x01 that tells if the action was successful or not.
+All commands changing a settings value on the Poly-D are answered with a packet of type 0x01 that tells if the action was successful or not.
 
 ## Received from Poly-D
 
@@ -56,8 +60,8 @@ All commands setting a value on the Poly-D are answered with a packet of type 0x
 | 01 00 nn        | nn = 0=Success, 5=Failure |
 | 03 nn           |                           |
 | 09 00 nn mm pp  | Firmware version nn.mm.pp |
-| 76 nn ...       | Instrument settings       |
-| 78 nn ...       | Sequencer pattern         |
+| 76 (25 bytes)   | Instrument settings       |
+| 78 (375 bytes)  | Sequencer pattern         |
 
 
 ### Instrument Settings
@@ -97,4 +101,4 @@ All commands setting a value on the Poly-D are answered with a packet of type 0x
 |------ | ------- | --------------------------- |
 | 0     | 00      | Bank                        |
 | 1     | 00      | Pattern                     |
-| 2 ... | nn ...  |                             |
+| 2 ... | nn ...  | to be found out...          |

@@ -1,5 +1,5 @@
 class PolyD_Config:
-    __OFFSET = 8
+    __OFFSET = 9
     CURVES = [ 'soft', 'medium', 'hard' ]
     KEY_PRIORITIES = [ 'low', 'high', 'last' ]
     CLOCKS = [ '1 PPS', '2 PPQ', '24 PPQ', '48 PPQ' ]
@@ -119,3 +119,7 @@ class PolyD_Config:
     @property
     def arpeggiator_output(self):
         return self.PORTS[self.__data[self.__OFFSET + 24]]
+
+    @property
+    def sysex(self):
+        return self.__data

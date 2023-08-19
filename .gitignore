@@ -14,3 +14,6 @@ page.html
 *.sqlite
 
 .vscode/
+
+*.zip
+*.syx

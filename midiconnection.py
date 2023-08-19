@@ -16,6 +16,12 @@ class MidiConnection(object):
         self.read_connected = False
         self.write_connected = False
 
+    def __enter__(self):
+        return self
+    
+    def __exit__(self, type, value, traceback):
+        self.disconnect()
+   
     @staticmethod
     def __get_device_names(names):
         result = set()
