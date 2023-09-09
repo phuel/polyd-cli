@@ -49,7 +49,7 @@ class PolyD:
             sysex = bytearray(sysex)
             sysex[9] = bank - 1
             sysex[10] = pattern - 1
-        answer = self.__midi.write(sysex)
+        self.__midi.write(sysex)
 
     def get_version(self):
         sysex = PolyD_Cmd.make_sysex(0, [ PolyD_Cmd.GET_FW_VERSION, 0 ])

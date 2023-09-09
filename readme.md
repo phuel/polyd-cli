@@ -76,18 +76,22 @@ Text arguments, like for example for the velocity curve can be abbreviated. The 
     -s FILENAME, --save FILENAME
                           saves the configuration and patterns in file.
     -r FILENAME, --restore FILENAME
-                          writes data from a file back to the instrument.
+                          writes the configuration from a file back to the instrument.
     -C, --config_only     saves the configuration only.
     -P, --patterns_only   saves the patterns only.
     -b BANK, --bank BANK  the bank number of the saved or restored pattern.
     -p PATTERN, --pattern PATTERN
                           the pattern number of the saved or restored pattern.
 
-If only the configuration is saved, with the `--config_only` option, or if only one pattern is saved with the `--bank`, `--pattern` options the output file is a SysEx file that can be sent to the Poly D to restore the data.
+The configuration is saved as a SysEx file that can be sent to the Poly D to restore the data.
 
-If all patterns are saved with or without the configuration the result is a zip-file containing all the individual SysEx file.
+Patterns are saved as seq files that can be restored using the SYNTHTRIBE program.
 
-If the data from such a zip file is restored, all data is restored. You cannot selectively restore parts of it other than moving a part of the content from the zip file.
+If all patterns are saved with or without the configuration the result is a zip-file containing all the individual SysEx and seq files.
+
+If the data from such a zip file is restored, onl the configuration is restored.
+
+Currently patterns cannot be restored by the app. For some reason the Poly D does not accept the pattern SysEx not sent by the SYNTHTRIBE program. Patterns sent by other programs under Linux and Windows were ignored are answered with Poly D's error SysEx.
 
 ## Poly-D SysEx Format
 

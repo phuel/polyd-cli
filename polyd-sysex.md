@@ -97,8 +97,75 @@ All commands changing a settings value on the Poly-D are answered with a packet 
 
 ### Sequencer Pattern
 
-| Index | Value   | Description                 |
-|------ | ------- | --------------------------- |
-| 0     | 00      | Bank                        |
-| 1     | 00      | Pattern                     |
-| 2 ... | nn ...  | to be found out...          |
+| Index | Value        | Description                 |
+|------ | ------------ | --------------------------- |
+| 0     | 00           | Bank No.                    |
+| 1     | 00           | Pattern No.                 |
+| 2...5 | 75 02 33 01  | Unknown                     |
+| 6...  |              | Pattern Data                |
+
+The Pattern Data are 10 bytes for each of the 32 steps = 320 bytes followed by 6 bytes pattern configuration.
+
+The resulting 326 bytes are stored in a 7 bit encoding. Seven bytes are sent as a group. First comes one byte containing the high bits of the seven bytes. Then follow seven bytes each containing the lower seven bits of the original data.
+
+**Step Data**
+
+| Index | Value | Description        |
+|------ | ----- | ------------------ |
+| 0     | 24    | MIDI node voice 1  |
+| 1     | 24    | MIDI node voice 2  |
+| 2     | 24    | MIDI node voice 3  |
+| 3     | 24    | MIDI node voice 4  |
+| 4     | 64    | Velocity voice 1   |
+| 5     | 64    | Velocity voice 2   |
+| 6     | 64    | Velocity voice 3   |
+| 7     | 64    | Velocity voice 4   |
+| 8     | 10    | Step Config Byte 1 |
+| 9     | 23    | Step Config Byte 2 |
+
+**Step Config Byte 1:**
+
+| Bit | Description           |
+|---- | --------------------- |
+| 0   | Glide (on if bit set) |
+| 1   |                       |
+| 2   | Accent                |
+| 3   | Rest                  |
+| 4   | Voice 1 used          |
+| 5   | Voice 2 used          |
+| 6   | Voice 3 used          |
+| 7   | Voice 4 used          |
+ 
+**Step Config Byte 2:**
+
+| Bit  | Description               |
+|----- | ------------------------- |
+| 0..2 | Gate (values: 0-7)        |
+| 3..4 | Ratchet (values: 0-3)     |
+| 5..7 | Voice count (values: 1-4) |
+
+**Gate values**
+
+| Value  | Gate  |
+|-----   | ----- |
+|  0     | 12.5% |
+|  1     | 25%   |
+|  2     | 37.5% |
+|  3     | 50%   |
+|  4     | 62.5% |
+|  5     | 75%   |
+|  6     | 87.5% |
+|  7     | 100%  |
+
+The 'Voice x used' and 'Voice count' fields don't seem to deliver the full flexibility they suggest. It looks like the voices must be used from voice 1 up. The SYNTHTRIBE program and the Poly D don't behave as expected if only one higher voice is set.
+
+**Configuration**
+
+| Index | Value        | Description                           |
+|------ | ------------ | ------------------------------------- |
+| 0     | 00           | Reserved                              |
+| 1     | 00           | Reserved                              |
+| 2     | 31           | No. of pattern steps - 1 (0 = 1 step) |
+| 3     | 0            | Swing - 50 (allowed: 0 - 25)          |
+| 4     | 0            | Transpose (allowed: -24 - 36)         |
+| 5     | 0            | Reserved                              |

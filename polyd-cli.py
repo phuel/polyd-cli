@@ -7,11 +7,17 @@ from midiconnection import MidiConnection, MidiException
 from polyd import PolyD, PolyD_Config, PolyD_Exception, PolyD_InvalidArgumentException
 
 NAME = 'polyd-cli'
-VERSION = 1.2
+VERSION = 1.3
 
 CONFIGNAME = "config.syx"
 CONFIGSIZE = 35
 PATTERNSIZE = 389
+
+SEQ_PREFIX = (0x23, 0x98, 0x54, 0x76, 0x00, 0x00, 0x00, 0x0C,
+              0x00, 0x50, 0x00, 0x4F, 0x00, 0x4C, 0x00, 0x59,
+              0x00, 0x20, 0x00, 0x44, 0x00, 0x00, 0x00, 0x0A,
+              0x00, 0x31, 0x00, 0x2E, 0x00, 0x31, 0x00, 0x2E,
+              0x00, 0x30, 0x00, 0x00, 0x01, 0x75)
 
 def get_range_string(values):
     text = ", ".join([f"\'{v}\'" for v in values])
@@ -25,12 +31,18 @@ def is_polyd(searched_name, port_name):
     return searched_name in port_name
 
 def pattern_name(bank, pattern):
-    return f"b{bank}p{pattern}.syx"
+    return f"b{bank}p{pattern}.seq"
+
+def syx2seq(syx):
+    seq = bytearray(SEQ_PREFIX)
+    seq.extend(syx[15:-1])
+    return seq
 
 def save(polyd, filename, config_only, patterns_only, bank, pattern):
     if bank is not None:
         # Write single pattern into a syx file
         pattern = polyd.get_pattern(bank, pattern)
+        pattern = syx2seq(pattern)
         with open(filename, "wb") as fp:
             fp.write(pattern)
     elif config_only:
@@ -47,6 +59,7 @@ def save(polyd, filename, config_only, patterns_only, bank, pattern):
             for b in range(1, 9):
                 for p in range(1,9):
                     pattern = polyd.get_pattern(b, p)
+                    pattern = syx2seq(pattern)
                     zip.writestr(pattern_name(b, p), pattern)
 
 def restore(polyd, filename, bank, pattern):
@@ -56,13 +69,6 @@ def restore(polyd, filename, bank, pattern):
             if CONFIGNAME in entries:
                 config = zip.read(CONFIGNAME)
                 polyd.send_sysex(config, "configuration")
-            for b in range(1, 9):
-                for p in range(1,9):
-                    name = pattern_name(b, p)
-                    if not name in entries:
-                        continue
-                    pattern = zip.read(name)
-                    polyd.send_sysex(config, f"pattern {b}:{p}")
     else:
         with open(filename, "rb") as fp:
             data = fp.read()
@@ -70,10 +76,8 @@ def restore(polyd, filename, bank, pattern):
             raise PolyD_Exception(f"File '{filename}' is no SysEx file.")
         if len(data) == CONFIGSIZE:
             polyd.send_sysex(data, "configuration")
-        elif len(data) == PATTERNSIZE:
-            polyd.set_pattern(data, bank, pattern)
         else:
-            raise PolyD_Exception(f"File '{filename}' is no Poly D SysEx file.")
+            raise PolyD_Exception(f"File '{filename}' is no Poly D config SysEx file.")
 
 def configure(polyd, args_dict):
     handlers = {
