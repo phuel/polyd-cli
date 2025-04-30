@@ -208,10 +208,12 @@ def main():
 
         polyd = PolyD(midi)
         version = polyd.get_version()
-        if version != (1,1,0):
+        if version[0] != 1 and version[1] != 1 and version[1] <= 3:
             print()
-            print("Warning: This program is tested with firmware 1.1.0 only.")
+            print("Warning: This program is tested with firmware up to 1.1.3 only.")
             print("         It might not work as intended on other versions.")
+            print()
+            print("Poly-D reports firmware", version)
             print()
             exit(1)
 
