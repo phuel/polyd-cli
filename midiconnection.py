@@ -26,12 +26,7 @@ class MidiConnection(object):
     def __get_device_names(names):
         result = set()
         for name in names:
-            #print(name)
-            m = re.match(r"^[^:]+:(.*)\s+\d+:\d+$", name)
-            if m is None:
-                result.add(name)
-            else:
-                result.add(m.group(1))
+            result.add(name)
         return sorted(result, key=lambda x: x.lower())
 
     @staticmethod
