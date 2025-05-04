@@ -5,7 +5,6 @@ from polyd_config import PolyD_Config
 from polyd_cmd import PolyD_Cmd
 
 
-
 class PolyD_Exception(MidiException):
     def __init__(self, message):
         super().__init__(message)
@@ -64,16 +63,21 @@ class PolyD:
 
     def set_rx_channel(self, rx):
         name = "MIDI rx channel"
-        self.__check_range(rx, 1, 16, name)
-        tx = self.__cached_config.midi_tx_channel
-        sysex = PolyD_Cmd.make_sysex(0, [ PolyD_Cmd.SET_MIDI_CHANNELS, 1, tx - 1, rx - 1 ])
+        if self.__normalize_text(rx) == 'all':
+            rx = 16
+        else:
+            rx = int(rx) - 1
+        self.__check_range(rx, 0, 16, name)
+        tx = self.__cached_config.midi_tx_channel_value
+        sysex = PolyD_Cmd.make_sysex(0, [ PolyD_Cmd.SET_MIDI_CHANNELS, 1, tx, rx ])
         self.send_sysex(sysex, name)
 
     def set_tx_channel(self, tx):
         name = "MIDI tx channel"
-        self.__check_range(tx, 1, 16, name)
-        rx = self.__cached_config.midi_rx_channel
-        sysex = PolyD_Cmd.make_sysex(0, [ PolyD_Cmd.SET_MIDI_CHANNELS, 1, tx - 1, rx - 1 ])
+        tx = int(tx) - 1
+        self.__check_range(tx, 0, 15, name)
+        rx = self.__cached_config.midi_rx_channel_value
+        sysex = PolyD_Cmd.make_sysex(0, [ PolyD_Cmd.SET_MIDI_CHANNELS, 1, tx, rx ])
         self.send_sysex(sysex, name)
 
     def set_in_transpose(self, value):
@@ -151,7 +155,7 @@ class PolyD:
 
     def set_sync_source(self, text):
         name = "sync clock source"
-        value = self.__text_to_value(text, PolyD_Config.PORTS, name)
+        value = self.__text_to_value(text, PolyD_Config.SYNC_PORTS, name)
         value 
         sysex = PolyD_Cmd.make_sysex(0, [ PolyD_Cmd.SET_CLOCK_SOURCE, value ])
         self.send_sysex(sysex, name)
@@ -221,6 +225,7 @@ class PolyD:
         answer = self.__midi.sysex_communicate(sysex)
         if answer.data[-2] != 0:
             raise PolyD_MidiException(f"Could not set the {name}")
+        self._config = None
 
     def __check_range(self, value, min, max, name):
         if value < min or value > max:
@@ -232,7 +237,6 @@ class PolyD:
             raise PolyD_InvalidArgumentException(f"Invalid {name} '{vtext}'")
         return value
 
-    
     @property
     def __cached_config(self):
         if self.__config is None:
@@ -250,5 +254,6 @@ class PolyD:
         return -1
 
     @staticmethod
-    def __normalize_text(text):
+    def __normalize_text(value):
+        text = str(value)
         return re.sub(r'\s+', '', text.lower())

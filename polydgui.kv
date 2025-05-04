@@ -1,0 +1,279 @@
+#:kivy 1.0
+
+#:set ROW_HEIGHT            sp(32)
+#:set LEFT_COL_WIDTH        sp(250)
+#:set LABEL_HEIGHT          sp(30)
+#:set SLIM_SPINNER_HEIGHT   LABEL_HEIGHT - sp(2)
+#:set INPUT_HEIGHT          LABEL_HEIGHT
+#:set ID_INPUT_WIDTH        sp(70)
+#:set SLIM_SPINNER_SMALL_WIDTH    sp(70)
+#:set SLIM_SPINNER_LARGE_WIDTH    sp(100)
+
+#:set TEXT_COLOR              (0.9, 0.9, 0.9, 0.9)
+
+<HBox>
+    orientation: "horizontal"
+    size_hint_y: None
+    height: ROW_HEIGHT
+
+<RowLabel@Label>
+    size_hint: None, None
+    size: (LEFT_COL_WIDTH, LABEL_HEIGHT)
+    halign: 'left'
+    valign: 'center'
+    text_size: self.size
+    padding: sp(10), sp(0)
+
+<IntInput>
+    multiline: False
+    halign: 'right'
+
+<OptionButton>
+    size_hint_y: None
+    height: SLIM_SPINNER_HEIGHT
+    color: (0, 0, 0,1)
+    background_normal: ''
+    background_color: (0.7, 0.7, 0.7, 1)
+
+<SlimSpinner@Spinner>
+    size_hint_y: None
+    height: SLIM_SPINNER_HEIGHT
+    color: TEXT_COLOR
+    text_autoupdate: True
+    option_cls: 'OptionButton'
+
+<SmallSpinner@SlimSpinner>
+    size_hint_x: None
+    width: SLIM_SPINNER_SMALL_WIDTH
+
+<LargeSpinner@SlimSpinner>
+    size_hint_x: None
+    width: SLIM_SPINNER_LARGE_WIDTH
+
+<MidiChannel@SmallSpinner>
+
+<VelocityEditor>
+    mode: mode
+    value: value
+    LargeSpinner:
+        id: mode
+    IntInput:
+        id: value
+        min_value: 1
+        size_hint: (None, None)
+        size: (ID_INPUT_WIDTH, INPUT_HEIGHT)
+
+<PolyDGuiView>
+    dev_id: dev_id
+    rx: rx
+    tx: tx
+    in_transpose: in_transpose
+    velocity_on: velocity_on
+    velocity_off: velocity_off
+    velocity_curve: velocity_curve
+    key_priority: key_priority
+    multi_trig: multi_trig
+    pitch_bend: pitch_bend
+    mod_range: mod_range
+    modulation_curve: modulation_curve
+    note_zero: note_zero
+    sync_rate: sync_rate
+    sync_source: sync_source
+    ext_clock_pol: ext_clock_pol
+    accent_velocity: accent_velocity
+    local_control: local_control
+    clock_out: clock_out
+    pbend_out: pbend_out
+    modwheel_out: modwheel_out
+    key_out: key_out
+    at_out: at_out
+    seq_out: seq_out
+    arp_out: arp_out
+
+    orientation: "vertical"
+    HBox:
+        RowLabel:
+            text: "Firmware Version"
+        Label:
+            text: root.version
+            halign: 'left'
+            valign: 'center'
+            text_size: self.size
+    HBox:
+        RowLabel:
+            text: "Device Id"
+        IntInput:
+            id: dev_id
+            size_hint: (None, None)
+            size: (ID_INPUT_WIDTH, INPUT_HEIGHT)
+
+    HBox:
+        RowLabel:
+            text: "MIDI RX Channel"
+        MidiChannel:
+            id: rx
+            values: root.midi_in_channels
+
+    HBox:
+        RowLabel:
+            text: "MIDI TX Channel"
+        MidiChannel:
+            id: tx
+            values: root.midi_out_channels
+
+    HBox:
+        RowLabel:
+            text: "MIDI IN Transpose"
+        SmallSpinner:
+            id: in_transpose
+            values: root.in_transposes
+
+    HBox:
+        RowLabel:
+            text: "Velocity On"
+        VelocityEditor:
+            id: velocity_on
+
+    HBox:
+        RowLabel:
+            text: "Velocity Off"
+        VelocityEditor:
+            id: velocity_off
+
+    HBox:
+        RowLabel:
+            text: "Velocity Curve"
+        SmallSpinner:
+            id: velocity_curve
+            values: root.velocity_curves
+
+    HBox:
+        RowLabel:
+            text: "Key Priority"
+        SmallSpinner:
+            id: key_priority
+            values: root.key_priorities
+
+    HBox:
+        RowLabel:
+            text: "Multi Trigger"
+        SmallSpinner:
+            id: multi_trig
+            values: root.off_on
+
+    HBox:
+        RowLabel:
+            text: "Pitchbend Range"
+        SmallSpinner:
+            id: pitch_bend
+            values: root.pitch_bends
+
+    HBox:
+        RowLabel:
+            text: "Modulation Wheel Range"
+        SmallSpinner:
+            id: mod_range
+            values: root.mod_ranges
+
+    HBox:
+        RowLabel:
+            text: "Modulation Curve"
+        SmallSpinner:
+            id: modulation_curve
+            values: root.modulation_curves
+
+    HBox:
+        RowLabel:
+            text: "Note @zero CV"
+        IntInput:
+            id: note_zero
+            size_hint: (None, None)
+            size: (ID_INPUT_WIDTH, INPUT_HEIGHT)
+
+    HBox:
+        RowLabel:
+            text: "Sync Rate"
+        SmallSpinner:
+            id: sync_rate
+            values: root.clocks
+
+    HBox:
+        RowLabel:
+            text: "Sync Source"
+        SmallSpinner:
+            id: sync_source
+            values: root.sync_ports
+
+
+    HBox:
+        RowLabel:
+            text: "Ext. Clock Polarity"
+        SmallSpinner:
+            id: ext_clock_pol
+            values: root.polarities
+
+    HBox:
+        RowLabel:
+            text: "Accent Velocity"
+        IntInput:
+            id: accent_velocity
+            size_hint: (None, None)
+            size: (ID_INPUT_WIDTH, INPUT_HEIGHT)
+
+    HBox:
+        RowLabel:
+            text: "Local Keyboard Control"
+        SmallSpinner:
+            id: local_control
+            values: root.off_on
+
+    HBox:
+        RowLabel:
+            text: "Clock Output"
+        SmallSpinner:
+            id: clock_out
+            values: root.ports
+
+    HBox:
+        RowLabel:
+            text: "Pitch Bend Output"
+        SmallSpinner:
+            id: pbend_out
+            values: root.ports
+
+    HBox:
+        RowLabel:
+            text: "Mod Wheel Output"
+        SmallSpinner:
+            id: modwheel_out
+            values: root.ports
+
+    HBox:
+        RowLabel:
+            text: "Keyboard Output"
+        SmallSpinner:
+            id: key_out
+            values: root.ports
+
+    HBox:
+        RowLabel:
+            text: "After Touch Output"
+        SmallSpinner:
+            id: at_out
+            values: root.ports
+    
+    HBox:
+        RowLabel:
+            text: "Sequencer Output"
+        SmallSpinner:
+            id: seq_out
+            values: root.ports
+
+    HBox:
+        RowLabel:
+            text: "Arpeggiator Output"
+        SmallSpinner:
+            id: arp_out
+            values: root.ports
+
+    Widget:

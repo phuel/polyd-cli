@@ -19,8 +19,8 @@ nn ... = Arguments
 | 00 nn           | Set device id             | nn = Device Id (0-127), 0=Any                   | 0       |
 | 02              |                           | Poly-D answers with Packet Type x03             |         |
 | 08 00           | Request firmware version  | Poly-D answers with Packet Type x09             |         |
-| 0E 00 nn mm     | Set MIDI channels         | nn = Out channel (0-16), 0=Any                  | 1       |
-|                 |                           | mm = In Channel (0-16), 0=Any                   | 1       |
+| 0E 00 nn mm     | Set MIDI channels         | nn = Out channel (0-15)                         | 0       |
+|                 |                           | mm = In Channel (0-16), 0=Any, 16=All           | 0       |
 | 0F nn           | Set MIDI in transpose     | nn = Range -12 - +12 semitones (0-24)           | 12      |
 | 10 nn mm pp     | Velocity info             | nn = Velocity On (0=dynamic, 1-127=Fixed)       | 0       |
 |                 |                           | mm = Velocity Off (0=dynamic, 1-127=Fixed)      | 0       |
@@ -30,7 +30,7 @@ nn ... = Arguments
 | 14 nn 00        | Set multi trigger         | nn = 0=Off, 1=On                                | 1       |
 | 15 nn           | Modulation curve          | nn = 0=Soft, 1=Medium, 2=Hard                   | 0       |
 | 16 nn           | Set note at 0V CV         | nn = MIDI note (0-127)                          | 24      |
-| 17 nn           | MIDI clock out            | nn = 0=Off, 1=MIDI DIN, 2=MIDI USB, 3=Both      | 3       |
+| 17 nn           | MIDI clock out            | nn = 0=Off, 1=MIDI DIN, 2=MIDI USB, 3=TRIG      | 3       |
 | 19 nn           | Polarity                  | nn = 0=Falling, 1=Rising                        | 1       |
 | 1A nn           | Sync clock rate           | nn = 0=1 PPS, 1=2 PPQ, 2=24 PPQ, 3=48 PPQ       | 2       | 
 | 1B nn           | Clock source              | nn = 0=Internal, 1=MIDI DIN, 2=MIDI USB, 3=Trig | 0       |

@@ -7,7 +7,7 @@ from midiconnection import MidiConnection, MidiException
 from polyd import PolyD, PolyD_Config, PolyD_Exception, PolyD_InvalidArgumentException
 
 NAME = 'polyd-cli'
-VERSION = 1.3
+VERSION = 1.4
 
 CONFIGNAME = "config.syx"
 CONFIGSIZE = 35
@@ -158,7 +158,7 @@ def main():
     parser.add_argument("--port", help="MIDI port name", default=None)
     parser.add_argument("--id", help="set the device id (0-127)", type=int, default=None)
     parser.add_argument("--rx", help="set MIDI rx channel (1-16)", type=int, default=None)
-    parser.add_argument("--tx", help="set MIDI rx channel (1-16)", type=int, default=None)
+    parser.add_argument("--tx", help="set MIDI rx channel (1-16, All)", type=int, default=None)
     parser.add_argument("--in_trans", help="set MIDI in transpose (-12-12)", type=int, default=None)
     parser.add_argument("--vel_on", help="set the note on velocity (0-127)", type=int, default=None)
     parser.add_argument("--vel_off", help="set the note off velocity (0-127)", type=int, default=None)
@@ -170,7 +170,7 @@ def main():
     parser.add_argument("--mod_curve", help=f"set the modulation curve ({get_range_string(PolyD_Config.CURVES)})", default=None)
     parser.add_argument("--note_zero", help="set the note at 0 CV (0-127)", type=int, default=None)
     parser.add_argument("--sync_rate", help=f"set the sync clock rate ({get_range_string(PolyD_Config.CLOCKS)})", default=None)
-    parser.add_argument("--sync_src", help=f"set the sync clock source ({get_range_string(PolyD_Config.PORTS)})", default=None)
+    parser.add_argument("--sync_src", help=f"set the sync clock source ({get_range_string(PolyD_Config.SYNC_PORTS)})", default=None)
     parser.add_argument("--local", help=f"set the local keyboard mode ('on', 'off' or 0-1)", default=None)
     parser.add_argument("--ext_pol", help=f"set the external clock polarity ({get_range_string(PolyD_Config.POLARITIES)})", default=None)
     parser.add_argument("--acc_vel", help="set the accent velocity (0-127)", type=int, default=None)

@@ -3,9 +3,11 @@ class PolyD_Config:
     CURVES = [ 'soft', 'medium', 'hard' ]
     KEY_PRIORITIES = [ 'low', 'high', 'last' ]
     CLOCKS = [ '1 PPS', '2 PPQ', '24 PPQ', '48 PPQ' ]
+    SYNC_PORTS = [ 'Internal', 'DIN', 'USB', 'TRIG' ]
     PORTS = [ 'off', 'DIN', 'USB', 'both' ]
     POLARITIES = [ 'falling', 'rising' ]
     MOD_RANGES = [ '20%', '50%', '100%', '200%', '300%' ]
+    OFF_ON = ( 'off', 'on' )
 
     def __init__(self, data):
         self.__data = data
@@ -15,16 +17,31 @@ class PolyD_Config:
         return self.__data[self.__OFFSET + 0]
 
     @property
+    def midi_rx_channel_value(self):
+        return self.__data[self.__OFFSET + 1]
+
+    @property
     def midi_rx_channel(self):
-        return self.__data[self.__OFFSET + 1] + 1
+        channel = self.midi_rx_channel_value
+        if channel == 16:
+            return 'All'
+        return str(channel + 1)
+
+    @property
+    def midi_tx_channel_value(self):
+        return self.__data[self.__OFFSET + 2]
 
     @property
     def midi_tx_channel(self):
-        return self.__data[self.__OFFSET + 2] + 1
+        return self.midi_tx_channel_value + 1
+
+    @property
+    def midi_in_transpose_value(self):
+        return self.__data[self.__OFFSET + 3]
 
     @property
     def midi_in_transpose(self):
-        return self.__data[self.__OFFSET + 3] - 12
+        return self.midi_in_transpose_value - 12
 
     @property
     def note_on_velocity(self):
@@ -43,15 +60,23 @@ class PolyD_Config:
         return self.CURVES[self.velocity_curve_value]
 
     @property
+    def key_priority_value(self):
+        return self.__data[self.__OFFSET + 7]
+
+    @property
     def key_priority(self):
-        return self.KEY_PRIORITIES[self.__data[self.__OFFSET + 7]]
+        return self.KEY_PRIORITIES[self.key_priority_value]
+
+    @property
+    def multi_trigger_value(self):
+        return self.__data[self.__OFFSET + 8]
 
     @property
     def multi_trigger(self):
-        if self.__data[self.__OFFSET + 8] != 0:
-            return "on"
+        if self.multi_trigger_value != 0:
+            return self.OFF_ON[1]
         else:
-            return "off"
+            return self.OFF_ON[0]
 
     @property
     def pitch_bend_range(self):
@@ -75,14 +100,14 @@ class PolyD_Config:
 
     @property
     def sync_clock_source(self):
-        return self.PORTS[self.__data[self.__OFFSET + 14]]
+        return self.SYNC_PORTS[self.__data[self.__OFFSET + 14]]
 
     @property
     def local_keyboard_mode(self):
         if self.__data[self.__OFFSET + 15] != 0:
-            return "off"
+            return self.OFF_ON[0]
         else:
-            return "on"
+            return self.OFF_ON[1]
 
     @property
     def ext_clock_polarity(self):

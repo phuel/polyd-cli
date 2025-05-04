@@ -1,12 +1,14 @@
 # Poly D CLI
 
-Poly D CLI is a command line program that can be used to configure the behringer Poly D synthesizer. Additionally it is able to save and restore the Poly D's configuration and the sequencer patterns.
+Poly D CLI is a command line program and a simple GUI program that can be used to configure the behringer Poly D synthesizer. Additionally it is able to save and restore the Poly D's configuration and the sequencer patterns.
 
-It offers the same settings as the official SYNTHTRIBE program, lacks a nice GUI, but runs on Linux as well.
+The programs offer the same settings as the official SYNTHTRIBE program, but have the advantage that they run on Linux as well.
 
-The program was written and tested with a Poly-D with firmware version 1.1.0 only. If an instrument with another firmware version is connected, a warning is printed, and the program aborts.
+The program was written and tested with a Poly D with firmware version 1.1.0 and 1.1.3 only. If an instrument with a lower or higher firmware version is connected, a warning is printed, and the program aborts.
 
 Poly D CLI uses the [Mido](https://github.com/mido/mido) library to talk to the synthesizer. This library needs to be installed separately like described on Mido's project page.
+
+The UI was created using [kivy](https://kivy.org), which must as well be installed separately.
 
 Configuring the Poly-D works only over the USB-MIDI connection. SysEx messages on the DIN ports seem to be ignored. When connecting to the synthesizer the first MIDI interface with `POLY D` in the name is used by the program. As an alternative  the `--port` option can be used to specify the MIDI port name.
 
@@ -21,6 +23,8 @@ Configuring the Poly-D works only over the USB-MIDI connection. SysEx messages o
                         [--clock_out CLOCK_OUT] [--pbend_out PBEND_OUT] [--mod_out MOD_OUT] [--key_out KEY_OUT]
                         [--at_out AT_OUT] [--seq_out SEQ_OUT] [--arp_out ARP_OUT]
 
+    usage: polyd-gui.py -- [-h] [-V] [-l] [--port PORT]
+
 ### Common options
 
     -h, --help            show this help message and exit
@@ -33,7 +37,7 @@ Configuring the Poly-D works only over the USB-MIDI connection. SysEx messages o
     -d, --dump            dumps the configuration to stdout.
 
     --id ID               set the device id (0-127)
-    --rx RX               set MIDI rx channel (1-16)
+    --rx RX               set MIDI rx channel (1-16, 'All')
     --tx TX               set MIDI rx channel (1-16)
     --in_trans IN_TRANS   set MIDI in transpose (-12-12)
     --vel_on VEL_ON       set the note on velocity (0-127)
