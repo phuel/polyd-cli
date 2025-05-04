@@ -32,6 +32,7 @@ class PolyDGui(App):
         super().__init__(**kwargs)
 
     def build(self):
+        self.title = "Poly D GUI"
         return PolyDGuiView(self.polyd)
 
 def main():
