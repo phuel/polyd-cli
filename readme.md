@@ -10,7 +10,8 @@ Poly D CLI uses the [Mido](https://github.com/mido/mido) library to talk to the 
 
 The UI was created using [kivy](https://kivy.org), which must as well be installed separately.
 
-Configuring the Poly-D works only over the USB-MIDI connection. SysEx messages on the DIN ports seem to be ignored. When connecting to the synthesizer the first MIDI interface with `POLY D` in the name is used by the program. As an alternative  the `--port` option can be used to specify the MIDI port name.
+Configuring the Poly-D does only work over the USB-MIDI connection. SysEx messages on the DIN ports seem to be ignored. When connecting to the synthesizer the first MIDI interface with `POLY D` in the name is used by the program. As an alternative  the `--port` option can be used to specify the MIDI port name.
+
 
 ## Usage
 
@@ -96,6 +97,10 @@ If all patterns are saved with or without the configuration the result is a zip-
 If the data from such a zip file is restored, onl the configuration is restored.
 
 Currently patterns cannot be restored by the app. For some reason the Poly D does not accept the pattern SysEx not sent by the SYNTHTRIBE program. Patterns sent by other programs under Linux and Windows were ignored are answered with Poly D's error SysEx.
+
+## UI
+
+![Screenshot of Poly D GUI](polydgui.png "Poly D GUI")
 
 ## Poly-D SysEx Format
 
