@@ -83,7 +83,7 @@ class PolyD:
     def set_in_transpose(self, value):
         name = "MIDI in transpose value"
         self.__check_range(value, -12, 12, name)
-        sysex = PolyD_Cmd.make_sysex(0, [ PolyD_Cmd.SET_MIDI_IN_TRANSPOSE, transpose ])
+        sysex = PolyD_Cmd.make_sysex(0, [ PolyD_Cmd.SET_MIDI_IN_TRANSPOSE, value ])
         self.send_sysex(sysex, name)
 
     def set_velocity_on(self, vel_on):
@@ -219,6 +219,11 @@ class PolyD:
         name = "arpeggiator MIDI output"
         value = self.__text_to_value(text, PolyD_Config.PORTS, name)
         sysex = PolyD_Cmd.make_sysex(0, [ PolyD_Cmd.SET_ARP_OUT, value ])
+        self.send_sysex(sysex, name)
+
+    def factory_restore(self):
+        name = "factory restore"
+        sysex = PolyD_Cmd.make_sysex(0, [ PolyD_Cmd.RESTORE_FACTORY_SETTINGS ])
         self.send_sysex(sysex, name)
 
     def send_sysex(self, sysex, name):

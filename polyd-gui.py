@@ -5,7 +5,7 @@ kivy.require('2.3.0')
 
 from kivy.config import Config
 Config.set('graphics', 'width', str(450))
-Config.set('graphics', 'height', str(850))
+Config.set('graphics', 'height', str(880))
 Config.set('graphics', 'resizable', False)
 Config.set('input', 'mouse', 'mouse,multitouch_on_demand')
 
