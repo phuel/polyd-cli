@@ -97,16 +97,13 @@ All commands changing a settings value on the Poly-D are answered with a packet 
 
 ### Sequencer Pattern
 
-| Index | Value        | Description                 |
-|------ | ------------ | --------------------------- |
-| 0     | 00           | Bank No.                    |
-| 1     | 00           | Pattern No.                 |
-| 2...5 | 75 02 33 01  | Unknown                     |
-| 6...  |              | Pattern Data                |
-
 The Pattern Data are 10 bytes for each of the 32 steps = 320 bytes followed by 6 bytes pattern configuration.
 
-The resulting 326 bytes are stored in a 7 bit encoding. Seven bytes are sent as a group. First comes one byte containing the high bits of the seven bytes. Then follow seven bytes each containing the lower seven bits of the original data.
+The resulting 326 bytes are stored in a 7 bit encoding. Seven bytes are sent as a group. First comes one byte containing the high bits of the seven bytes. Then follow seven bytes each containing the lower seven bits of the original data. This gives in total 373 bytes.
+
+In a sysex answer these 373 bytes have a 15 byte header and the trailing 0xF7 byte giving 389 bytes for the complete sysex.
+
+In a SEQ file exported from the Synthtribe app the sequence data are stored after a 38 byte long header giving a file size of 411 bytes.
 
 **Step Data**
 
@@ -168,4 +165,18 @@ The 'Voice x used' and 'Voice count' fields don't seem to deliver the full flexi
 | 2     | 31           | No. of pattern steps - 1 (0 = 1 step) |
 | 3     | 0            | Swing - 50 (allowed: 0 - 25)          |
 | 4     | 0            | Transpose (allowed: -24 - 36)         |
-| 5     | 0            | Reserved                              |
+| 5     | 0            | Division                              |
+
+**Division values**
+
+| Value | Division                    |
+|-------|---------------------------- |
+| 0     | Unused (pre 1.1.3 firmware) |
+| 1     | 1/4                         |
+| 2     | 1/4T                        |
+| 3     | 1/8                         |
+| 4     | 1/8T                        |
+| 5     | 1/16 (default)              |
+| 6     | 1/16T                       |
+| 7     | 1/32                        |
+| 8     | 1/32T                       |
