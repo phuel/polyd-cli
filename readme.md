@@ -90,13 +90,9 @@ Text arguments, like for example for the velocity curve can be abbreviated. The 
 
 The configuration is saved as a SysEx file that can be sent to the Poly D to restore the data.
 
-Patterns are saved as seq files that can be restored using the SYNTHTRIBE program.
+Patterns are saved as seq files that can be edited using the SYNTHTRIBE program.
 
-If all patterns are saved with or without the configuration the result is a zip-file containing all the individual SysEx and seq files.
-
-If the data from such a zip file is restored, onl the configuration is restored.
-
-Currently patterns cannot be restored by the app. For some reason the Poly D does not accept the pattern SysEx not sent by the SYNTHTRIBE program. Patterns sent by other programs under Linux and Windows were ignored are answered with Poly D's error SysEx.
+If all patterns are saved with or without the configuration the result is a zip-file containing all the sysex file for the configuration and the pattern seq files.
 
 ## UI
 
@@ -104,4 +100,4 @@ Currently patterns cannot be restored by the app. For some reason the Poly D doe
 
 ## Poly-D SysEx Format
 
-The SysEx commands used by `polyd-cli.py` can be found [here](polyd-sysex.md).
+The SysEx commands used by the Poly-D can be found [here](polyd-sysex.md).

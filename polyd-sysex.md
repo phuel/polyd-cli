@@ -45,10 +45,8 @@ nn ... = Arguments
 | 2F nn           | Set local keyboard mode   | nn = 0=On, 1=Off                                | 1       |
 | 75              | Request settings          | Poly-D answers with Packet Type 76              |         |
 | 76 .....        | Set settings              | Poly-D answers with Packet Type 01              |         |
-| 77 nn mm        | Request sequencer pattern | nn = Bank                                       |         |
-|                 |                           | mm = Pattern                                    |         |
-|                 |                           | Poly-D answers with Packet Type 78              |         |
-| 78 .....        | Set a pattern             | Poly-D sends no answer                          |         |
+| 77 nn mm        | Request sequencer pattern | nn = Bank<br/> mm = Pattern<br/> Poly-D answers with Packet Type 78              |         |
+| 78 .....        | Set a pattern             | In case of an error (e.g. wrong checksum) the Poly-D answers with a sysex 01 error packet.<br/>In case of success the Poly-D sends no answer. |         |
 | 7D              | Restore factory settings  |                                                 |         |
 
 All commands changing a settings value on the Poly-D are answered with a packet of type 0x01 that tells if the action was successful or not.
@@ -102,6 +100,25 @@ The Pattern Data are 10 bytes for each of the 32 steps = 320 bytes followed by 6
 The resulting 326 bytes are stored in a 7 bit encoding. Seven bytes are sent as a group. First comes one byte containing the high bits of the seven bytes. Then follow seven bytes each containing the lower seven bits of the original data. This gives in total 373 bytes.
 
 In a sysex answer these 373 bytes have a 15 byte header and the trailing 0xF7 byte giving 389 bytes for the complete sysex.
+
+**Sysex Pattern Data**
+|Index|Values            |Description                           |
+|-----|------------------|--------------------------------------|
+| 0   | F0               | Sysex start                          |
+| 1   | 00 20 32         | Manufacturer SYS Id (Behringer GmbH) |
+| 4   | 00 01 0C         | Model Id (Poly-D)                    |
+| 7   | 00               | Device Id                            |
+| 8   | 78               | Sysex Command Id                     |
+| 9   | nn               | Bank (0-7)                           |
+| 10  | mm               | Pattern (0-7)                        |
+| 11  | 75               |                                      |
+| 12  | 02               |                                      |
+| 13  | CS (lower 7 bit) | Checksum over the 373 pattern bytes  |
+| 14  | CS (8th bit)     |                                      |
+| 15  | Pattern data     | 373 bytes in 7 bit encoding          |
+| 388 | F7               | Sysex end                            |
+
+The checksum is the low byte of the sum of all 373 pattern data bytes.
 
 In a SEQ file exported from the Synthtribe app the sequence data are stored after a 38 byte long header giving a file size of 411 bytes.
 

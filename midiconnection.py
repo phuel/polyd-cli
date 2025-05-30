@@ -18,10 +18,10 @@ class MidiConnection(object):
 
     def __enter__(self):
         return self
-    
+
     def __exit__(self, type, value, traceback):
         self.disconnect()
-   
+
     @staticmethod
     def __get_device_names(names):
         result = set()
@@ -83,7 +83,6 @@ class MidiConnection(object):
     def write(self, data):
         """ Sends a MIDI message. """
         msg = mido.Message.from_bytes(data)
-        #print(msg.hex())
         self.__output.send(msg)
 
     def read(self):
@@ -94,6 +93,11 @@ class MidiConnection(object):
         except:
             raise MidiException("Timeout while waiting for answer from MIDI device.")
 
+    def try_read(self):
+        if self.__queue.empty():
+            return None
+        return self.__queue.get()
+
     def send_sysex(self, filename):
         """ Sends the contents of a sysex file. """
         if not os.path.isfile(filename):
@@ -103,12 +107,14 @@ class MidiConnection(object):
 
     def sysex_communicate(self, message_data):
         """ Sends a sysex question and waits for the answer. """
+        if message_data[0] != 0xF0 or message_data[-1] != 0xF7:
+            raise MidiException("Invalid sysex data")
         self.write(message_data)
         while True:
             msg = self.read()
             if msg.type == 'sysex':
                 return msg
-
+    
     def panic(self):
         self.__output.panic()
 

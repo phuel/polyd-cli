@@ -1,22 +1,20 @@
 #! /usr/bin/env python
 
 import argparse
+import sys
 import zipfile
 
 from midiconnection import MidiConnection, MidiException
-from polyd import PolyD, PolyD_Config, PolyD_Exception, PolyD_InvalidArgumentException
+from polyd_cmd import PolyD_Cmd
+from polyd_exc import PolyD_Exception, PolyD_InvalidArgumentException
+from polyd_config import PolyD_Config
+from polyd import PolyD 
 
 NAME = 'polyd-cli'
-VERSION = 1.4
+VERSION = 1.5
 
 CONFIGNAME = "config.syx"
 CONFIGSIZE = 35
-
-SEQ_PREFIX = (0x23, 0x98, 0x54, 0x76, 0x00, 0x00, 0x00, 0x0C,
-              0x00, 0x50, 0x00, 0x4F, 0x00, 0x4C, 0x00, 0x59,
-              0x00, 0x20, 0x00, 0x44, 0x00, 0x00, 0x00, 0x0A,
-              0x00, 0x31, 0x00, 0x2E, 0x00, 0x31, 0x00, 0x2E,
-              0x00, 0x33, 0x00, 0x00, 0x01, 0x75)
 
 def get_range_string(values):
     text = ", ".join([f"\'{v}\'" for v in values])
@@ -32,51 +30,91 @@ def is_polyd(searched_name, port_name):
 def pattern_name(bank, pattern):
     return f"b{bank}p{pattern}.seq"
 
-def syx2seq(syx):
-    seq = bytearray(SEQ_PREFIX)
-    seq.extend(syx[15:-1])
-    return seq
+
+def save_single_pattern(polyd, filename, bank, pattern):
+    # Write single pattern into a seq file
+    sysex = polyd.get_pattern(bank, pattern)
+    seq = PolyD_Cmd.syx2seq(sysex)
+    with open(filename, "wb") as fp:
+        fp.write(seq)
+
+def save_config(polyd, filename):
+    # Write the configuration into a syx file
+    config = polyd.get_config()
+    with open(filename, "wb") as fp:
+        fp.write(config.sysex)
+
+def save_all(polyd, filename):
+    # Write a zip file with the configuration and all patterns
+    with zipfile.ZipFile(filename, "w") as zip:
+        config = polyd.get_config()
+        zip.writestr(CONFIGNAME, config.sysex)
+
+        for bank in range(1, 9):
+            for pattern in range(1,9):
+                sysex = polyd.get_pattern(bank, pattern)
+                seq = PolyD_Cmd.syx2seq(sysex)
+                zip.writestr(pattern_name(bank, pattern), seq)
 
 def save(polyd, filename, config_only, patterns_only, bank, pattern):
-    if bank is not None:
-        # Write single pattern into a syx file
-        pattern = polyd.get_pattern(bank, pattern)
-        pattern = syx2seq(pattern)
-        with open(filename, "wb") as fp:
-            fp.write(pattern)
+    if bank is not None and pattern is not None:
+        save_single_pattern(polyd, filename, bank, pattern)
     elif config_only:
-        # Write the configuration into a syx file
-        config = polyd.get_config()
-        with open(filename, "wb") as fp:
-            fp.write(config.sysex)
+        save_config(polyd, filename)
     else:
-        # Write a zip file with the configuration and all patterns
-        with zipfile.ZipFile(filename, "w") as zip:
-            if not patterns_only:
-                config = polyd.get_config()
-                zip.writestr(CONFIGNAME, config.sysex)
-            for b in range(1, 9):
-                for p in range(1,9):
-                    pattern = polyd.get_pattern(b, p)
-                    pattern = syx2seq(pattern)
-                    zip.writestr(pattern_name(b, p), pattern)
+        save_all(polyd, filename)
 
-def restore(polyd, filename, bank, pattern):
-    if zipfile.is_zipfile(filename):
-        with zipfile.ZipFile(filename, "r") as zip:
-            entries = zip.namelist()
-            if CONFIGNAME in entries:
-                config = zip.read(CONFIGNAME)
-                polyd.send_sysex(config, "configuration")
+def restore_pattern_sysex(polyd, sysex, bank, pattern):
+    if bank is not None:
+        sysex[9] = bank - 1
+    if pattern is not None:
+        sysex[10] = pattern - 2
+    polyd.send_pattern_sysex(sysex)
+
+def restore_seq(polyd, seq, bank, pattern):
+    if bank is None or pattern is None:
+        raise PolyD_InvalidArgumentException("Pattern and/or Bank argument missing.")
+    sysex = PolyD_Cmd.seq2syx(0, bank, pattern, seq)
+    polyd.send_pattern_sysex(sysex)
+
+def restore_zip(polyd, filename, config_only, patterns_only):
+    with zipfile.ZipFile(filename, "r") as zip:
+        entries = zip.namelist()
+        if CONFIGNAME in entries and not patterns_only:
+            sys.stdout.write("Restoring configuration\r")
+            sys.stdout.flush()
+            config = zip.read(CONFIGNAME)
+            polyd.send_config_sysex(config, "configuration")
+        if not config_only:
+            for bank in range(1, 9):
+                for pattern in range(1,9):
+                    name = pattern_name(bank, pattern)
+                    if name in entries:
+                        sys.stdout.write(f"Restoring pattern {bank} {pattern}  \r")
+                        sys.stdout.flush()
+                        seq = zip.read(name)
+                        restore_seq(polyd, seq, bank, pattern)
+
+def restore_file(polyd, filename, config_only, patterns_only, bank, pattern):
+    with open(filename, "rb") as fp:
+        data = fp.read()
+    if len(data) == CONFIGSIZE:
+        if not patterns_only:
+            polyd.send_config_sysex(data, "configuration")
+    elif len(data) == PolyD_Cmd.PATTERN_SYX_SIZE:
+        if not config_only:
+            restore_pattern_sysex(polyd, data, bank, pattern)
+    elif len(data) == PolyD_Cmd.SEQ_SIZE:
+        if not config_only:
+            restore_seq(polyd, data, bank, pattern)
     else:
-        with open(filename, "rb") as fp:
-            data = fp.read()
-        if data[0] != 0xF0 or data[-1] != 0xF7:
-            raise PolyD_Exception(f"File '{filename}' is no SysEx file.")
-        if len(data) == CONFIGSIZE:
-            polyd.send_sysex(data, "configuration")
-        else:
-            raise PolyD_Exception(f"File '{filename}' is no Poly D config SysEx file.")
+        raise PolyD_Exception(f"File '{filename}' is no known Poly D config file.")
+
+def restore(polyd, filename, config_only, patterns_only, bank, pattern):
+    if zipfile.is_zipfile(filename):
+        restore_zip(polyd, filename, config_only, patterns_only)
+    else:
+        restore_file(polyd, filename, config_only, patterns_only, bank, pattern)
 
 def configure(polyd, args_dict):
     handlers = {
@@ -150,8 +188,8 @@ def main():
     parser.add_argument("-d", "--dump", help="dump the configuration to stdout", action="store_true")
     parser.add_argument("-s", "--save", help="save the configuration and patterns in file", default=None)
     parser.add_argument("-r", "--restore", help="write data from a file back to the instrument", default=None)
-    parser.add_argument("-C", "--config_only", help="save the configuration only", action="store_true")
-    parser.add_argument("-P", "--patterns_only", help="save the patterns only", action="store_true")
+    parser.add_argument("-C", "--config_only", help="save/restore the configuration only", action="store_true")
+    parser.add_argument("-P", "--patterns_only", help="restore the patterns only", action="store_true")
     parser.add_argument("-b", "--bank", help="the bank number of the saved or restored pattern", type=int, default=None)
     parser.add_argument("-p", "--pattern", help="the pattern number of the saved or restored pattern", type=int, default=None)
     parser.add_argument("--port", help="MIDI port name", default=None)
@@ -187,11 +225,11 @@ def main():
         for name in ids:
             print("    ", name)
         return
- 
+
     port = 'POLY D'
     if args.port is not None:
         port = args.port
-    
+
     with MidiConnection() as midi:
         in_id = first_or_default(midi.get_input_ids(), lambda n: is_polyd(port, n))
         out_id = first_or_default(midi.get_output_ids(), lambda n: is_polyd(port, n))
@@ -219,9 +257,9 @@ def main():
         try:
             if args.save is not None:
                 save(polyd, args.save, args.config_only, args.patterns_only, args.bank, args.pattern)
-            
+
             if args.restore is not None:
-                restore(polyd, args.restore, args.bank, args.pattern)
+                restore(polyd, args.restore, args.config_only, args.patterns_only, args.bank, args.pattern)
 
             args_dict = vars(args)
             configure(polyd, args_dict)
@@ -232,6 +270,6 @@ def main():
 
         except MidiException as exc:
             print("Error:", exc.message)
-    
+
 if __name__ == "__main__":
     main()
